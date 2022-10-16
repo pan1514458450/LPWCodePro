@@ -1,4 +1,5 @@
 ﻿using LPWService.BaseRepostiory;
+using SqlSugar;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,6 +34,11 @@ namespace LPWService.StaticFile
                 values = values.Where(exp);
             return values;
         }
+        public static ISugarQueryable<T> StaticJoin<T,Q>(this ISugarQueryable<T> values, Expression<Func<T, Q, bool>> exp)
+        {
+           return values.InnerJoin<Q>(exp);
+        }
+
         #region json
         /// <summary>
         /// 转json

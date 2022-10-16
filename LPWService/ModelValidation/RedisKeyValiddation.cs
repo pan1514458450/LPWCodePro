@@ -20,7 +20,6 @@ namespace LPWService.ModelValidation
             var result = ExtensionMethods.csredis.GetDeleteRedis<string>(array[0]).Result;
             if (result == array[1].ToUpper())
             {
-                ExtensionMethods.csredis.DeleteRedis(array[0]).Wait();
                 return base.IsValid(value, validationContext);
             }
             return new ValidationResult(ErrorMessage);

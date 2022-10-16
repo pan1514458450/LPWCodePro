@@ -7,9 +7,11 @@ using LPWService.StaticFile;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Model.UserModel;
+using SqlSugar;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 
@@ -173,13 +175,10 @@ namespace LPWBussion.SysBussion
         #endregion
         public async Task<List<SysMenuDTO>> GetMyMenu(string email)
         {
-            var dbresult = await (from i in _unitAdmin.Get<SysAdminUsers>()
-                                  join o in _unitAdmin.Get<SysRoleMenus>()
-                                  on i.RoleId equals o.RoleId
-                                  join p in _unitAdmin.Get<SysMenus>()
-                                  on o.MenuId equals p.Id
-                                  where o.IsDelete == 0 && p.IsDelete == 0
-                                  select p).ToListAsync();
+            var dbresult =await _unitAdmin          
+                .JoinTableAsync<SysMenus, SysRoleMenus, SysAdminUsers>
+                ((x, c) => x.Id == c.Id&&c.IsDelete==0, (x, c, d) => c.RoleId == d.RoleId&&d.IsDelete==0)
+                .Where(x=> x.IsDelete==0).ToListAsync();
             var result = mapper.Map<List<SysMenuDTO>>(dbresult);
             var sysmenudto = new SysMenuDTO();
             var sysmenudtoList = new List<SysMenuDTO>();
@@ -270,18 +269,18 @@ namespace LPWBussion.SysBussion
             throw new NotImplementedException();
         }
 
-        //public async Task<bool> GetUser(string ToEmail, string email)
-        //{
-        //    StringBuilder sb = new StringBuilder();
-        //    sb.Append("with sysadmin as    select * from SysAdminUsers");
-        //    sb.Append(" where Email=@email union all");
-        //    sb.Append(" select G.* from SysAdminUsers inner join SysAdminUsers as G on SysAdminUsers.Id=G.ParantId) ");
-        //    sb.Append(" select * from sysadmin w order by Id ");
-        //    object para = new
-        //    {
-        //        @email = email
-        //    };
-        //    return await _dapper.Get<SysAdminUsers>(sb.ToString(),para);
-        //}
+        public async Task<List<SysAdminUsers>> GetUser(string ToEmail, string email)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" with sysadmin as  (  select  * from SysAdminUsers ");
+            sb.Append(" where Email=@email union all ");
+            sb.Append("  select  G.* from SysAdminUsers inner join SysAdminUsers as G on SysAdminUsers.Id=G.ParantId where IsDelete=0) ");
+            sb.Append("  select  * from sysadmin w order by  CreateDateTime desc ");
+            object para = new
+            {
+                @email = ToEmail
+            };
+            return await _dapper.GetALL<SysAdminUsers>(sb.ToString(), para);
+        }
     }
 }

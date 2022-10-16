@@ -21,6 +21,12 @@ namespace LPWCodePro.Controllers
             _sendemail = sendemail;
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<object> GetUs()
+        {
+          return await  _sysBussionService.GetUser("1514458450@qq.com", "");
+        } 
         [HttpGet]
         [Authorize]
         public async Task SendEmial()

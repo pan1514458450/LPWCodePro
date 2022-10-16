@@ -20,4 +20,8 @@ namespace LPWBussion.DTO.SysDTO
         [EmailAddress(ErrorMessage = "邮箱格式错误")]
         public string Email { get; set; }
     }
+    public class GetUserPageDTO : PageDTO
+    {
+        public string? Email { get; set; }
+    }
 }

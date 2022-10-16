@@ -8,6 +8,7 @@ namespace LPWService.BaseRepostiory
 {
     public interface ISqlHelp
     {
-        Task<T> Get<T>(string sql, params object[] args);
+        Task<T> Get<T>(string sql,  object args);
+        Task<List<T>> GetALL<T>(string sql,  object args);
     }
 }

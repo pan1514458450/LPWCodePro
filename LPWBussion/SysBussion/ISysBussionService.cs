@@ -1,10 +1,12 @@
 ﻿using LPWBussion.DTO;
 using LPWBussion.DTO.SysDTO;
+using Model.UserModel;
 
 namespace LPWBussion.SysBussion
 {
     public interface ISysBussionService
     {
+        Task<List<SysAdminUsers>> GetUser(string ToEmail, string email);
         Task<bool> UpdateUser(UpdateUserDTO userDTO, string email);
         Task<bool> DeleteUser(string ToEmail, string email);
         //Task<bool> GetUser(string ToEmail, string email);

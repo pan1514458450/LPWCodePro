@@ -16,7 +16,7 @@ namespace LPWService.ModelValidation
             if (value.CheckSgReflection())
                 return base.IsValid(value, validationContext);
             else
-                return new ValidationResult(this.ErrorMessage);
+                return new ValidationResult(ErrorMessage);
         }
     }
 }
