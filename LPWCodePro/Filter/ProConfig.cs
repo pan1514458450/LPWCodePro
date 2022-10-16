@@ -1,6 +1,7 @@
 ﻿using LPWBussion.AutoMapperFile;
 using LPWBussion.DTO;
 using LPWService;
+using LPWService.Desgin;
 using LPWService.StaticFile;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace LPWCodePro.Filter
             builder.Services.AddDbContext<DbContextModule>(options =>
             options.UseSqlServer(ConstCode.SqlServer), ServiceLifetime.Singleton);
             builder.Services.AddAutoMapper(typeof(MapperProfile));
+            //builder.Services.AddProxyDynamic();
             var csredis = new CSRedis.CSRedisClient(builder.Configuration.GetConnectionString("Redis"));
             RedisHelper.Initialization(csredis);
             ISqlSugarClient sugarClient = new SqlSugarClient(new ConnectionConfig()
