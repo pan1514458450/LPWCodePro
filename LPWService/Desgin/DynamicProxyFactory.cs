@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace LPWService.Desgin
 {
-    public class DynamicProxyFactory
+    public  class DynamicProxyFactory<T>
     {
-        protected DynamicProxy dynamicProxy = new DynamicProxy();
+     public   static DynamicProxy dynamicProxy;
+        static Dictionary<string,T> dic;
+        static DynamicProxyFactory() { dynamicProxy = new DynamicProxy();dic = new Dictionary<string, T>(); }
 
-        public void AddProxy<T>(Action<object?[]?> beftr, Action<object?[]?> after)
+        public static T AddProxy(Action<object?[]?> beftr, Action<object?[]?> after)
         {
-            dynamicProxy.AddMethod<T>(beftr, after);
+            var key= typeof(T).Name + beftr.GetHashCode() + after.GetHashCode();
+            if (!dic.ContainsKey(key))
+            {
+                dic.TryAdd(key,dynamicProxy.AddMethod<T>(dynamicProxy.Before, dynamicProxy.After));
+            }
+            return dic[key];
         }
     }
 }

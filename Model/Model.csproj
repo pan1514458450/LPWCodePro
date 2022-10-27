@@ -12,8 +12,4 @@
     <PackageReference Include="SqlSugarCore" Version="5.1.3.25" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

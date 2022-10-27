@@ -1,4 +1,5 @@
 ﻿using LPWService.BaseRepostiory;
+using Microsoft.AspNetCore.Http;
 using SqlSugar;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
@@ -16,6 +17,7 @@ namespace LPWService.StaticFile
         private static HttpClient client;
         internal readonly static ICsredisHelp csredis;
 
+     
         static ExtensionMethods()
         {
             client = new HttpClient();
@@ -23,22 +25,17 @@ namespace LPWService.StaticFile
             options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             options.Encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
             csredis = new CsredisHelp();
+            
         }
-        public static IQueryable<F> QueryAndJoin<Q, T, C, F>(this IQueryable<Q> quer, IQueryable<T> values, Expression<Func<Q, C>> firstexp, Expression<Func<T, C>> twoexp, Expression<Func<Q, T, F>> exp)
+     
+
+        #region string
+        public static bool IsNull(this string str)
         {
-            return quer.Join(values, firstexp, twoexp, exp);
-        }
-        public static IQueryable<T> WhereIf<T>(this IQueryable<T> values, bool IsAnd, Expression<Func<T, bool>> exp)
-        {
-            if (IsAnd)
-                values = values.Where(exp);
-            return values;
-        }
-        public static ISugarQueryable<T> StaticJoin<T,Q>(this ISugarQueryable<T> values, Expression<Func<T, Q, bool>> exp)
-        {
-           return values.InnerJoin<Q>(exp);
+            return string.IsNullOrWhiteSpace(str);
         }
 
+        #endregion
         #region json
         /// <summary>
         /// 转json

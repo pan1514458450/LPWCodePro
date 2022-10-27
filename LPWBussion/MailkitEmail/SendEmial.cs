@@ -15,12 +15,13 @@ namespace LPWBussion.MailkitEmail
             _EmailService = emailService;
             _csredis = csredis;
         }
+        SenderInfo sendinfo = new SenderInfo()
+        {
+            SenderEmail = ConstCode.SendEmail,
+        };
         public async Task MySendEmail(string email)
         {
-            var sendinfo = new SenderInfo()
-            {
-                SenderEmail = ConstCode.SendEmail,
-            };
+           
             Random random = new Random();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < ConstCode.VerificationCode; i++)
@@ -29,7 +30,6 @@ namespace LPWBussion.MailkitEmail
             }
             await _csredis.SetRedis(email, builder.ToString(), 300);
             await _EmailService.SendAsync(email, "验证码", builder.ToString(), false, sendinfo);
-
         }
     }
 }

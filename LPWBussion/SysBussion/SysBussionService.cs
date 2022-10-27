@@ -4,7 +4,12 @@ using LPWBussion.DTO.SysDTO;
 using LPWService;
 using LPWService.BaseRepostiory;
 using LPWService.StaticFile;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Features.Authentication;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Tokens;
 using Model.UserModel;
 using SqlSugar;
@@ -12,6 +17,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 
@@ -23,11 +30,11 @@ namespace LPWBussion.SysBussion
         private readonly IMapper mapper;
         private readonly ICsredisHelp csredis;
         private readonly ISqlSugarRepository sugarRepository;
-        private readonly ISqlHelp _dapper;
-
+        private readonly IAdoSql _dapper;
         public SysBussionService(IUnitWorkRepository unitAdmin, IMapper mapper,
-            ICsredisHelp csredis, ISqlSugarRepository sugarRepository, ISqlHelp dapper)
+            ICsredisHelp csredis, ISqlSugarRepository sugarRepository, IAdoSql dapper)
         {
+         
             _unitAdmin = unitAdmin;
             this.mapper = mapper;
             this.csredis = csredis;
@@ -46,7 +53,7 @@ namespace LPWBussion.SysBussion
             }
             else
             {
-                Coderesult.Message = Token(result.Email);
+                Coderesult.Message = Token(result.Email,result.Id);
             }
             return Coderesult;
         }
@@ -145,9 +152,9 @@ namespace LPWBussion.SysBussion
 
         #region 私有方法
 
-        private string Token(string email)
+        private string Token(string email,int id)
         {
-            var claims = new[] { new Claim(ClaimTypes.Email, email) };
+            var claims = new[] { new Claim("Email", email),new Claim("Id",id.ToString().Sha256Encrypto()) };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConstCode.IssuerSigningKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -223,6 +230,7 @@ namespace LPWBussion.SysBussion
 
         public async Task<bool> CreateMenu(SysMenuDTO sysMenu)
         {
+
             var dbmenu = mapper.Map<SysMenus>(sysMenu);
             return await _unitAdmin.AddAsync(dbmenu) > 0 ? true : false;
         }
@@ -275,12 +283,15 @@ namespace LPWBussion.SysBussion
             sb.Append(" with sysadmin as  (  select  * from SysAdminUsers ");
             sb.Append(" where Email=@email union all ");
             sb.Append("  select  G.* from SysAdminUsers inner join SysAdminUsers as G on SysAdminUsers.Id=G.ParantId where IsDelete=0) ");
-            sb.Append("  select  * from sysadmin w order by  CreateDateTime desc ");
-            object para = new
+            sb.Append($"  select  * from sysadmin {(email.IsNull()? " where Email=@Toemail":"")}   w order by  CreateDateTime desc ");
+            List<SqlParameter> para=new List<SqlParameter>();
+            para.Add(new SqlParameter("@email", ToEmail));
+
+            if (email.IsNull())
             {
-                @email = ToEmail
-            };
-            return await _dapper.GetALL<SysAdminUsers>(sb.ToString(), para);
+                para.Add(new SqlParameter("@Toemail", email));
+            }
+            return await _dapper.GetAllAsync<SysAdminUsers>(sb.ToString(), para);
         }
     }
 }

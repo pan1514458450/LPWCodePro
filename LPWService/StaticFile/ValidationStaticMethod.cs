@@ -1,4 +1,4 @@
-﻿using LPWService.StaticFile;
+﻿using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -11,6 +11,7 @@ namespace LPWService.StaticFile
         {
             dic = new Dictionary<string, Func<object, bool>>();
         }
+        
         internal static bool CheckSgReflection(this object obj)
         {
             string sg = string.Empty;
@@ -41,10 +42,11 @@ namespace LPWService.StaticFile
         }
         internal static bool ChekSgExper(this object? obj)
         {
-            var type = obj.GetType();   
+            var type = obj.GetType();
             if (!dic.ContainsKey(type.FullName))
             {
                 var para = Expression.Parameter(type, "x");
+                Expression.Parameter(type);
                 var inttype = typeof(int);
                 Expression exp = null;
                 foreach (var item in type.GetProperties())
@@ -52,7 +54,7 @@ namespace LPWService.StaticFile
                     if (item.Name == "Sg")
                     {
                         exp = Md5Entry(exp);
-                        Expression.Equal(exp, Expression.Property(para, item.Name));
+                        exp = Expression.Equal(exp, Expression.Property(para, item.Name));
                     }
                     else
                     {

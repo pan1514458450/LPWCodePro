@@ -22,12 +22,17 @@ namespace LPWCodePro.Filter
         private static WebApplicationBuilder webApplicationBuilder;
         internal static void Load(WebApplicationBuilder builder)
         {
-
             webApplicationBuilder = builder;
+
+            webApplicationBuilder.Services.AddCors(x =>
+            {
+                x.AddPolicy("all", s => s.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
             builder.Services.AddDbContext<DbContextModule>(options =>
             options.UseSqlServer(ConstCode.SqlServer), ServiceLifetime.Singleton);
             builder.Services.AddAutoMapper(typeof(MapperProfile));
             //builder.Services.AddProxyDynamic();
+
             var csredis = new CSRedis.CSRedisClient(builder.Configuration.GetConnectionString("Redis"));
             RedisHelper.Initialization(csredis);
             ISqlSugarClient sugarClient = new SqlSugarClient(new ConnectionConfig()
@@ -63,7 +68,7 @@ namespace LPWCodePro.Filter
 
             Assembly.Load("LPWBussion").ExportedTypes.TreeClass();
             Assembly.Load("LPWService").ExportedTypes.TreeClass();
-
+           builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -125,6 +130,7 @@ namespace LPWCodePro.Filter
         {
             foreach (var item in type)
             {
+                
                 if (!item.IsClass) continue;
                 item.GetInterfaces().TreeInterfaces(item);
             }
@@ -133,8 +139,6 @@ namespace LPWCodePro.Filter
         {
             foreach (var item in type)
             {
-
-                if (!item.IsInterface) continue;
                 webApplicationBuilder.Services.AddSingleton(item, ImpType);
             }
         }

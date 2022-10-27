@@ -5,10 +5,7 @@ namespace Model.UserModel
 {
     public class SysAdminUsers : SoureModel
     {
-        public SysAdminUsers()
-        {
-
-        }
+        
         [Comment("用户账号")]
         public string Email { get; set; }
         [Column(TypeName = ("varchar(64)"))]
@@ -18,5 +15,9 @@ namespace Model.UserModel
         public int ParantId { get; set; }
         [Comment("权限Id")]
         public int RoleId { get; set; }
+        [Comment("用户名")]
+        public string UserName { get; set; }
+        [Comment("钱包余额")]
+        public decimal Wallet { get; set; }
     }
 }

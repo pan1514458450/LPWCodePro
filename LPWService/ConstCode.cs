@@ -2,9 +2,11 @@
 {
     public struct ConstCode
     {
+        public const int CsRedisTime = 360 * 24;
         public const int VerificationCode = 4;
         public const string SqlServer = "server=.;database=Sysdb;uid=sa;pwd=123456;";
         public const string SendEmail = "pan1514458450@163.com";
+        public const string RedisCon = "127.0.0.1:6379,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=10240";
         public const int ClockSkew = 10;
         /// <summary>
         /// 接受人

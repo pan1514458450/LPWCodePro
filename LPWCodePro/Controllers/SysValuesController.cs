@@ -1,8 +1,10 @@
-﻿using LPWBussion.DTO;
+﻿using LPWBussion.AutoMapperFile;
+using LPWBussion.DTO;
 using LPWBussion.DTO.SysDTO;
 using LPWBussion.MailkitEmail;
 using LPWBussion.SysBussion;
 using LPWService;
+using LPWService.StaticFile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +17,18 @@ namespace LPWCodePro.Controllers
     {
         private readonly ISysBussionService _sysBussionService;
         private readonly ISendEmail _sendemail;
-        public SysValuesController(ISysBussionService sysBussionService, ISendEmail sendemail)
+        private readonly IUserClaimsMethods userClaims;
+        public SysValuesController(ISysBussionService sysBussionService, ISendEmail sendemail,IUserClaimsMethods userClaims)
         {
             _sysBussionService = sysBussionService;
             _sendemail = sendemail;
+            this.userClaims = userClaims;
         }
-
+        [AllowAnonymous]
+        [HttpPost]
+        public  void test(TestModel test)
+        {
+        }
         [AllowAnonymous]
         [HttpGet]
         public async Task<object> GetUs()
@@ -31,6 +39,7 @@ namespace LPWCodePro.Controllers
         [Authorize]
         public async Task SendEmial()
         {
+
             await _sendemail.MySendEmail(GetClaims());
 
         }
@@ -124,5 +133,10 @@ namespace LPWCodePro.Controllers
 
         }
 
+    }
+    public class TestModel
+    {
+        public int MyProperty { get; set; }
+        public List<TestModel> MyProperty1 { get; set; }
     }
 }

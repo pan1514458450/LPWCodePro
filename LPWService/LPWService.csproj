@@ -10,6 +10,8 @@
     <PackageReference Include="CSRedisCore" Version="3.8.669" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

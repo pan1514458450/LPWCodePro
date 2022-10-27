@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace LPWService.Desgin
 {
     public class DynamicProxy : DispatchProxy
     {
+        public DynamicProxy()
+        {
+            Console.WriteLine("zhixing");
+            Console.WriteLine(this.GetType().GetHashCode());
+        }
         /// <summary>
         /// 目标类
         /// </summary>
@@ -26,27 +26,34 @@ namespace LPWService.Desgin
         private object? retval { get; set; }
         protected sealed override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
-            if(_before != null)
+            Console.WriteLine(this.GetType().GetHashCode());
+
+            if (_before != null)
                 _before(args);
-            if(retval !=null)
+            if (retval != null)
                 return retval;
-                retval= targetMethod.Invoke(InjectionClass.GetService(targetMethod.DeclaringType),args);
-            if(_after!=null)
+            retval = targetMethod.Invoke(InjectionClass.GetService(targetMethod.DeclaringType), args);
+            if (_after != null)
                 _after(args);
             return retval;
         }
-        public T AddMethod<T>(Action<object?[]?> before, Action<object?[]? > after)
+        private string id = "1";
+        public T AddMethod<T>(Action<object?[]?> before, Action<object?[]?> after)
         {
+            this.id = "2";
             object proxy = Create<T, DynamicProxy>();
-            this._before = before;
+            ((DynamicProxy)proxy)._before=before;   
+            ((DynamicProxy)proxy)._after=after;   
+            Console.WriteLine(this.GetType().GetHashCode());
+
             this._after = after;
             return (T)proxy;
         }
-        internal void Before(object?[]? objects)
+        public void Before(object?[]? objects)
         {
             Console.WriteLine("执行前");
         }
-        internal void After(object?[]? objects)
+        public void After(object?[]? objects)
         {
             Console.WriteLine("执行后");
         }
